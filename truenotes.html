@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note Taking App</title>
+    <title>TrueNotes App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f2f5;
             margin: 0; /* Reset default margin */
-            padding-top: 80px; /* Add padding to top to offset navbar */
+            padding-top: 75px; /* Add padding to top to offset navbar */
             color: #1c1e21;
+            transition: background-color 0.3s;
         }
 
 
@@ -18,7 +20,7 @@
             background-color: #ffffff;
             padding: 0 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: fixed; /* Make navbar stick to the top */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -41,29 +43,33 @@
             font-size: 15px;
             font-weight: bold;
             color: #fff;
-            background-color: #007bff;
+            background-color: #28a745; /* A fresh green color */
             border: none;
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between icon and text */
         }
 
+
         .nav-button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
 
         .app-container {
             width: 100%;
             max-width: 800px;
             margin: auto;
-            padding: 0 20px; /* Adjust horizontal padding */
+            padding: 0 20px;
         }
 
         .note-input-area {
             background: #ffffff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 20px;
         }
 
@@ -104,10 +110,12 @@
         .note {
             background: #ffffff;
             padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
             margin-bottom: 15px;
             position: relative;
+            transition: box-shadow 0.2s ease-in-out;
+            word-wrap: break-word;
         }
 
         .note h3 {
@@ -120,24 +128,41 @@
             margin-bottom: 10px;
         }
 
+        .note:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
         .delete-note-btn {
             position: absolute;
             top: 10px;
             right: 10px;
             background: #f44336;
-            color: white;
+            color: #fff;
             border: none;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
             font-weight: bold;
-            line-height: 24px;
+            line-height: 28px;
             text-align: center;
+            opacity: 0; /* Hide by default */
+            transition: opacity 0.2s, background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .note:hover .delete-note-btn {
+            opacity: 1; /* Show on hover */
         }
 
         .delete-note-btn:hover {
             background: #d32f2f;
+        }
+
+        #empty-notes-message {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px 20px;
         }
 
         .hidden {
@@ -147,7 +172,7 @@
         /* --- Responsive Design for Small Screens --- */
         @media (max-width: 600px) {
             body {
-                padding-top: 70px; /* Adjust for slightly smaller navbar */
+                padding-top: 65px; /* Adjust for slightly smaller navbar */
             }
 
             .navbar {
@@ -163,13 +188,25 @@
                 padding: 6px 12px;
                 font-size: 14px;
             }
+            
+            .nav-button .button-text {
+                display: none; /* Hide text on small screens */
+            }
+
+            .app-container {
+                padding: 0 15px; /* Reduce padding on smaller screens */
+                width: 100%; /* Ensure it uses full available width */
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <a href="#" class="navbar-brand">TrueNotes</a>
-        <button id="new-note-btn" class="nav-button">New Note</button>
+        <button id="new-note-btn" class="nav-button">
+            <i class="fa-solid fa-plus"></i>
+            <span class="button-text">New Note</span>
+        </button>
     </nav>
     <div class="app-container">
         <div class="note-input-area hidden">
@@ -178,6 +215,10 @@
             <button id="add-note-btn">Add Note</button>
         </div>
         <div id="notes-list">
+            <div id="empty-notes-message" class="hidden">
+                <h3>No notes yet</h3>
+                <p>Click "New Note" to get started!</p>
+            </div>
             <!-- Notes will be dynamically added here -->
         </div>
     </div>
@@ -189,6 +230,7 @@
             const noteContentInput = document.getElementById('note-content');
             const addNoteBtn = document.getElementById('add-note-btn');
             const notesList = document.getElementById('notes-list');
+            const emptyNotesMessage = document.getElementById('empty-notes-message');
 
             newNoteBtn.addEventListener('click', () => {
                 noteInputArea.classList.toggle('hidden');
@@ -199,6 +241,15 @@
             loadNotes();
 
             addNoteBtn.addEventListener('click', addNote);
+
+            function checkEmptyState() {
+                const notes = getNotes();
+                if (notes.length === 0) {
+                    emptyNotesMessage.classList.remove('hidden');
+                } else {
+                    emptyNotesMessage.classList.add('hidden');
+                }
+            }
 
             function getNotes() {
                 return JSON.parse(localStorage.getItem('notes')) || [];
@@ -221,7 +272,7 @@
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.classList.add('delete-note-btn');
-                deleteBtn.innerHTML = '&times;';
+                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 deleteBtn.addEventListener('click', () => deleteNote(note.id));
 
                 noteEl.appendChild(deleteBtn);
@@ -259,6 +310,8 @@
 
                 // Hide the input area after adding a note
                 noteInputArea.classList.add('hidden');
+
+                checkEmptyState();
             }
 
             function deleteNote(id) {
@@ -270,12 +323,14 @@
                 if (noteToRemove) {
                     noteToRemove.remove();
                 }
+                checkEmptyState();
             }
 
             function loadNotes() {
                 const notes = getNotes();
-                notesList.innerHTML = ''; // Clear existing notes
+                document.querySelectorAll('.note').forEach(note => note.remove()); // Clear only notes
                 notes.forEach(note => notesList.prepend(createNoteElement(note)));
+                checkEmptyState();
             }
         });
     </script>
