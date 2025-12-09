@@ -1,1 +1,87 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipe Flow Game</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #cfe9ff; /* Light blue background */
+    }
+
+    /* Navbar */
+    nav {
+        background: #ffffff;
+        padding: 15px 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 22px;
+        font-weight: bold;
+        color: #0073b1;
+    }
+
+    /* Hero Section */
+    .hero {
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .hero h1 {
+        color: #004b80;
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        color: #004b80;
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+
+    .play-btn {
+        padding: 12px 25px;
+        font-size: 18px;
+        color: #fff;
+        background: #007acc;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .play-btn:hover {
+        background: #0065a8;
+    }
+</style>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+    Pipe Flow
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Welcome to Pipe Flow</h1>
+    <p>Click below to start the Pipe Flow game</p>
+    <button class="play-btn" onclick="startGame()">Play Game</button>
+</section>
+
+<script>
+    function startGame() {
+        // link your game file here
+        window.location.href = "https://demonisblack.com/code/2019/pipeflow/game/";
+    }
+</script>
+
+</body>
+</html>
